@@ -27,17 +27,19 @@ def add_new_data():
 if st.button("➕ Aggiungi nuovo dato"):
     add_new_data()
 
-# 🔹 Auto-refresh ogni 2 secondi (streamlit-extras trick)
-st_autorefresh = st.sidebar.checkbox("Auto-refresh attivo", value=True)
+# 🔹 Auto-refresh ogni 2 secondi
+auto_refresh = st.sidebar.checkbox("Auto-refresh attivo", value=True)
 
-if st_autorefresh:
-    count = st.query_params().get("count", [0])
-    count = int(count[0]) + 1
-    st.query_params(count=count)
+if auto_refresh:
+    # usa un contatore in session_state invece dei query_params
+    if "counter" not in st.session_state:
+        st.session_state["counter"] = 0
+    st.session_state["counter"] += 1
 
-    if count % 2 == 0:  # ogni 2 secondi
+    if st.session_state["counter"] % 2 == 0:  # ogni 2 cicli = 2 secondi
         add_new_data()
-        time.sleep(2)
+    time.sleep(2)
+    st.experimental_rerun()
 
 # 🔹 Mostra i grafici
 if not st.session_state["data"].empty:
