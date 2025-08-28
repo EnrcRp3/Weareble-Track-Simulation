@@ -1,33 +1,31 @@
-import time
 import random
 import pandas as pd
 import streamlit as st
 
-# Inizializza DataFrame vuoto
-data = pd.DataFrame(columns=["timestamp", "speed", "heart_rate", "acceleration"])
-
 st.title("🏃 Wearable Tracker Simulation")
 
-# Placeholder per grafici
-placeholder = st.empty()
+# Inizializza session_state se vuoto
+if "data" not in st.session_state:
+    st.session_state["data"] = pd.DataFrame(columns=["timestamp", "speed", "heart_rate", "acceleration"])
 
-# Genera dati simulati (con loop controllato, max 100 iterazioni)
-for i in range(50):
+# Genera nuovo dato quando clicchi il pulsante
+if st.button("Aggiungi nuovo dato"):
     new_row = {
         "timestamp": pd.Timestamp.now(),
         "speed": round(random.uniform(5, 25), 2),         # km/h
         "heart_rate": random.randint(90, 190),            # bpm
         "acceleration": round(random.uniform(-3, 3), 2)   # m/s^2
     }
-    # Concatenazione sicura
-    new_row_df = pd.DataFrame([new_row])
-    data = pd.concat([data, new_row_df], ignore_index=True)
+    st.session_state["data"] = pd.concat(
+        [st.session_state["data"], pd.DataFrame([new_row])],
+        ignore_index=True
+    )
 
-    # Imposta indice temporale
-    data = data.set_index("timestamp")
+# Prepara dati per grafico
+if not st.session_state["data"].empty:
+    df = st.session_state["data"].set_index("timestamp")
 
-    with placeholder.container():
-        st.line_chart(data[["speed", "heart_rate"]])
-        st.line_chart(data[["acceleration"]])
-
-    time.sleep(0.5)
+    st.line_chart(df[["speed", "heart_rate"]])
+    st.line_chart(df[["acceleration"]])
+else:
+    st.info("Clicca il pulsante per generare i primi dati.")
