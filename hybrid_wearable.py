@@ -31,9 +31,9 @@ if st.button("➕ Aggiungi nuovo dato"):
 st_autorefresh = st.sidebar.checkbox("Auto-refresh attivo", value=True)
 
 if st_autorefresh:
-    count = st.experimental_get_query_params().get("count", [0])
+    count = st.query_params().get("count", [0])
     count = int(count[0]) + 1
-    st.experimental_set_query_params(count=count)
+    st.query_params(count=count)
 
     if count % 2 == 0:  # ogni 2 secondi
         add_new_data()
