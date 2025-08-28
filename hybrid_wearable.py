@@ -39,7 +39,7 @@ if auto_refresh:
     if st.session_state["counter"] % 2 == 0:  # ogni 2 cicli = 2 secondi
         add_new_data()
     time.sleep(2)
-    st.experimental_rerun()
+    st.rerun()
 
 # 🔹 Mostra i grafici
 if not st.session_state["data"].empty:
