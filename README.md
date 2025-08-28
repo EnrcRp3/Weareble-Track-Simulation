@@ -22,17 +22,17 @@ Il progetto mostra come si può emulare il comportamento di sensori indossabili 
    cd wearable-tracker-simulation
    
 2. Crea un ambiente virtuale (consigliato):
-
-python -m venv env
-source env/bin/activate      # Mac/Linux
-env\Scripts\activate         # Windows
+   ```bash
+   python -m venv env
+   source env/bin/activate      # Mac/Linux
+   env\Scripts\activate         # Windows
 
 
 3. Installa le dipendenze:
-
-pip install -r requirements.txt
+   ```bash
+   pip install -r requirements.txt
 
 
 4. Avvia l’app:
-
-streamlit run wearable.py
+   ```bash
+   streamlit run wearable.py
