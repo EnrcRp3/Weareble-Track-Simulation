@@ -2,7 +2,6 @@ import streamlit as st
 import pandas as pd
 import json
 import paho.mqtt.client as mqtt
-import time
 
 # Config MQTT
 BROKER = "test.mosquitto.org"
@@ -30,26 +29,23 @@ def on_message(client, userdata, msg):
         ignore_index=True
     )
 
-# Setup MQTT client
-client = mqtt.Client()
-client.on_message = on_message
-client.connect(BROKER, PORT, 60)
-client.subscribe(TOPIC)
+# Setup MQTT client (solo una volta)
+if "mqtt_client" not in st.session_state:
+    client = mqtt.Client()
+    client.on_message = on_message
+    client.connect(BROKER, PORT, 60)
+    client.subscribe(TOPIC)
+    client.loop_start()
+    st.session_state["mqtt_client"] = client
 
-# Avvia loop in background
-client.loop_start()
+# Refresh UI
+st.markdown("### Dati in tempo reale")
+if not st.session_state["data"].empty:
+    df = st.session_state["data"].set_index("timestamp")
+    st.line_chart(df[["speed", "heart_rate"]])
+    st.line_chart(df[["acceleration"]])
+else:
+    st.info("⏳ In attesa di dati dal wearable (publisher MQTT)...")
 
-# UI refresh
-placeholder = st.empty()
-
-while True:
-    with placeholder.container():
-        if not st.session_state["data"].empty:
-            df = st.session_state["data"].set_index("timestamp")
-            st.subheader("Andamento velocità e battito cardiaco")
-            st.line_chart(df[["speed", "heart_rate"]])
-            st.subheader("Andamento accelerazione")
-            st.line_chart(df[["acceleration"]])
-        else:
-            st.info("In attesa di dati dal wearable (publisher MQTT)...")
-    time.sleep(2)
+# Forza refresh automatico ogni 5 secondi
+st.autorefresh(interval=5000, key="mqtt-refresh")
